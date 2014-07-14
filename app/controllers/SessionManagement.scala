@@ -2,7 +2,7 @@ package controllers
 
 import org.apache.commons.codec.digest.DigestUtils
 import play.api.libs.concurrent.Promise
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, Controller, Security}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Right, Left}
@@ -40,8 +40,8 @@ object SessionManagement extends Controller {
       case Right(b: Boolean) =>
         val session = createSessionID(user)
         sessions += session
-        Ok("").withSession(
-          "connected" -> "user",
+        Ok("Login successful").withSession(
+          Security.username -> "user",
           "session" -> session.id
         )
       case t: String => InternalServerError(t)
