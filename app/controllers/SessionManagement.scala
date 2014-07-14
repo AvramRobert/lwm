@@ -30,7 +30,7 @@ object SessionManagement extends Controller {
   def login() = Action.async(parse.json) { request =>
     val user = (request.body \ "user").as[String]
     val password = (request.body \ "password").as[String]
-    val timeoutFuture = Promise.timeout("Oops", 4.second)
+    val timeoutFuture = Promise.timeout("Oops", 15.second)
 
     val authFuture = authenticate(user, password)
 
