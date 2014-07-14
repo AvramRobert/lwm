@@ -1,14 +1,14 @@
-function ajaxRequest(url, type, contentType, data) {
+function ajaxRequest(url, type, contentType, data, funct) {
     $.ajax({
         url: url,
         type: type,
         contentType: contentType + '; charset=UTF-8',
         data: JSON.stringify(data),
-        success: function (data) {
-            alert('YEA');
+        success: function (message) {
+            funct(message);
         },
-        error: function () {
-            alert('Something went wrong');
+        error: function (error) {
+            funct(error);
         }
     });
 }

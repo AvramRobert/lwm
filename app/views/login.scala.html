@@ -8,27 +8,45 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
+        <script src="http://knockoutjs.com/downloads/knockout-3.1.0.js" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/ajax.js")" type="text/javascript"></script>
     </head>
     <body>
-        <div id="login">
-            <form id="loginForm">
-                <input type="text" id="username">
-                <input type="password" id="pass">
-                <input type="submit" id="search" value="Log In">
-            </form>
-        </div>
+        <form id="loginForm">
+            <div id="loginContainer" class="" data-bind="html: contents">
+                <table> <tr> <td><label class="">Username: </label>
+                    <input type="text" id="username" data-bind=""> </td><tr>
+                    <tr> <td><label class="">Password: </label>
+                    <input type="password" id="pass" data-bind=""> </td></tr>
+                    <tr> <td><input type="submit" id="search" value="Log In"> </td></tr></table>
+            </div>
+        </form>
         <script type="text/javascript">
-        $(document).ready(function() {
-        $('#loginForm').submit(function(event) {
+        var e = '<p class=""> Not authorized or response took too long!</p>' ;
+        var s = '<p class=""> Successfully logged in! </p>' ;
+
+        $ (document).ready(function() {
+        $ ('#loginForm').submit(function(event) {
         event.preventDefault();
-        var u = $('#username').val();
-        var p = $('#pass').val();
-        ajaxRequest('/session', 'POST', 'application/json', {user: u, password: p});
+        var u = $ ( '#username' ).val();
+        var p = $ ( '#pass' ).val();
+        ajaxRequest('/session', 'POST', 'application/json', { user : u, password : p }, set) ;
         });
         });
 
+        var viewModel = {
+        contents: ko.observable()
+        };
 
+        function applyView(view) {
+            viewModel.contents(view);
+            ko.applyBindings(viewModel) ;
+        }
+
+        function set(message) {
+            if(message.statusText == null) applyView(s);
+            else applyView(e);
+        }
         </script>
     </body>
 </html>
