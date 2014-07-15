@@ -40,7 +40,7 @@
         event.preventDefault();
         var u = $ ( '#username' ).val();
         var p = $ ( '#pass' ).val();
-        ajaxRequest('/session', 'POST', 'application/json', { user : u, password : p }, set) ;
+        ajaxRequest('/sessions', 'POST', 'application/json', { user : u, password : p }, set) ;
         });
         });
 
