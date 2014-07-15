@@ -5,16 +5,11 @@ import akka.actor.Actor.Receive
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.commons.codec.digest.DigestUtils
-<<<<<<< HEAD
-import play.api.libs.concurrent.Promise
-import play.api.mvc.{Action, Controller, Security}
-=======
 import org.joda.time.DateTime
 import play.Configuration
 import play.api.libs.concurrent.{Akka, Promise}
 import play.api.mvc.{Action, Controller, Security}
 import util.LDAPAuthentication._
->>>>>>> 542ead569f3091ef16cf1da132dd59c8f75c1b80
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Right, Left}
@@ -46,10 +41,6 @@ object SessionManagement extends Controller {
 
     val user = (request.body \ "user").as[String]
     val password = (request.body \ "password").as[String]
-<<<<<<< HEAD
-    val timeoutFuture = Promise.timeout("Oops", 15.second)
-=======
->>>>>>> 542ead569f3091ef16cf1da132dd59c8f75c1b80
 
     val timeoutFuture = Promise.timeout("Oops", 15.second)
     val authFuture = (sessionsHandler ? SessionHandler.AuthenticationRequest(user, password)).mapTo[Either[String, SessionHandler.Session]]
@@ -58,20 +49,11 @@ object SessionManagement extends Controller {
     Future.firstCompletedOf(Seq(authFuture, timeoutFuture)).map {
       case Left(message: String) =>
         Unauthorized(message)
-<<<<<<< HEAD
-      case Right(b: Boolean) =>
-        val session = createSessionID(user)
-        sessions += session
-        Ok("Login successful").withSession(
-          Security.username -> "user",
-          "session" -> session.id
-=======
       case Right(session: SessionHandler.Session) =>
         Ok("Login successful").withSession(
           Security.username -> "user",
           "session" -> session.id,
           "expires" -> session.expirationDate.toString
->>>>>>> 542ead569f3091ef16cf1da132dd59c8f75c1b80
         )
       case t: String => InternalServerError(t)
     }
