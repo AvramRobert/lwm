@@ -1,4 +1,5 @@
-function ajaxRequest(url, type, contentType, data, funct) {
+function ajaxRequest(url, type, cType, data, funct) {
+    var contentType = (cType != null)? cType: "application/x-www-form-urlencoded";
     $.ajax({
         url: url,
         type: type,

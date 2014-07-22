@@ -9,54 +9,18 @@
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
         <script src="http://knockoutjs.com/downloads/knockout-3.1.0.js" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/ajax.js")" type="text/javascript"></script>
+        @helper.requireJs(core = "http://requirejs.org/docs/release/2.1.14/minified/require.js", module = "../../public/javascripts/main.js")
     </head>
-    <body>
-        <form id="loginForm" class="" role="" data-bind="html: contents">
-            <div id="usernameContainer" class="">
-                <label class="">Username: </label>
-                <div class=""><input type="text" id="username" placeholder="Username" data-bind="">
-                </div>
-            </div>
-
-            <div id="passwordContainer" class="">
-                <label class="">Password: </label>
-                    <div class=""><input type="password" id="pass" placeholder="Password" data-bind="">
-                    </div>
-            </div>
-
-             <div id="submit" class="">
-                 <div class="">
-                     <input type="submit" id="search" value="Log In">
-                 </div>
-             </div>
-        </form>
+    <body data-bind="html: body">
         <script type="text/javascript">
-        var e = '<div class=""> <div class=""><label class=""> Not authorized or response took too long!</label></div></div>' ;
-        var s = '<div class=""> <div class=""><label class=""> Successfully logged in! </label></div></div>' ;
-
-        $ (document).ready(function() {
-        $ ('#loginForm').submit(function(event) {
-        event.preventDefault();
-        var u = $ ( '#username' ).val();
-        var p = $ ( '#pass' ).val();
-        ajaxRequest('/sessions', 'POST', 'application/json', { user : u, password : p }, set) ;
-        });
-        });
-
-        var viewModel = {
-        contents: ko.observable()
-        };
-
-        function applyView(view) {
-            viewModel.contents(view);
-            ko.applyBindings(viewModel) ;
-        }
-
-        function set(message) {
-            if(message.status == 401 || message.status == 500) applyView(e);
-            else if(message.toLowerCase() == 'login successful') applyView(s);
-        }
-        </script>
+        require( {
+        baseUrl : 'javascripts',
+        paths : {
+        jquery : 'http://code.jquery.com/jquery-2.1.0.min.js',
+        ko : 'http://knockoutjs.com/downloads/knockout-3.1.0.js'
+        },
+        priority :[ 'jquery' ][ 'ko' ]
+        }, ['main']);
+         </script>
     </body>
 </html>

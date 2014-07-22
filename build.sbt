@@ -1,3 +1,6 @@
+import play.PlayImport._
+import play.PlayImport.PlayKeys._
+
 name := """lwm"""
 
 version := "1.0-SNAPSHOT"
@@ -13,6 +16,7 @@ libraryDependencies ++= Seq(
   ws
 )
 
+requireJs += "main.js"
 
 libraryDependencies += "com.unboundid" % "unboundid-ldapsdk" % "2.3.6" withSources() withJavadoc()
 
