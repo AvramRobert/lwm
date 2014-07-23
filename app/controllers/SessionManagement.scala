@@ -1,17 +1,16 @@
 package controllers
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import akka.util.Timeout
+import controllers.Permissions.Role
 import org.apache.commons.codec.digest.DigestUtils
 import org.joda.time.DateTime
-import play.Configuration
-import play.api.libs.concurrent.{Akka, Promise}
-import play.api.mvc.{Action, Controller, Security}
-import util.LDAPAuthentication._
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.Configuration
+import play.api.libs.concurrent.Promise
+import play.api.mvc.{Security, Action, Controller}
+import play.libs.Akka
+
 import scala.concurrent.Future
-import scala.util.{Right, Left}
-import play.api.Play.current
 
 
 /**
@@ -22,12 +21,11 @@ object SessionManagement extends Controller {
   import scala.concurrent.duration._
   import akka.pattern.ask
   import scala.concurrent.ExecutionContext.Implicits.global
+  import play.api.Play.current
 
 
-  private val config = play.Configuration.root()
   private implicit val timeout = Timeout(15.seconds)
-
-  private val sessionsHandler = Akka.system.actorOf(SessionHandler.props(config), "sessions")
+  private val sessionsHandler = Akka.system.actorSelection("user/sessions")
 
   /*
    * {
@@ -61,8 +59,6 @@ object SessionManagement extends Controller {
 
     NoContent.withNewSession
   }
-
-
 }
 
 
@@ -74,32 +70,38 @@ object SessionHandler {
 
   case class SessionRequest(user: String)
 
-  case class Session(id: String, expirationDate: DateTime, user: String)
+  case class Session(id: String, expirationDate: DateTime, user: String, groups: List[String], role: Role)
 
   def props(config: Configuration) = Props(new SessionHandler(config))
 }
 
 class SessionHandler(config: Configuration) extends Actor {
 
+  import util.LDAPAuthentication._
   import SessionHandler._
+  import scala.concurrent.ExecutionContext.Implicits.global
 
   private var sessions: Set[Session] = Set.empty
 
-  val DN = config.getString("lwm.bindDN")
-  val bindHost = config.getString("lwm.bindHost")
-  val bindPort = config.getInt("lwm.bindPort")
+  val DN = config.getString("lwm.bindDN").get
+  val GDN = config.getString("lwm.groupDN").get
+  val bindHost = config.getString("lwm.bindHost").get
+  val bindPort = config.getInt("lwm.bindPort").get
 
   def receive: Receive = {
     case AuthenticationRequest(user, password) =>
       val authFuture = authenticate(user, password, bindHost, bindPort, DN)
+
       val requester = sender()
       authFuture.map {
         case l@Left(error) =>
           requester ! l
         case Right(success) =>
-          val session = createSessionID(user)
-          sessions += session
-          requester ! Right(session)
+          val sessionFuture = createSessionID(user)
+          sessionFuture map { session =>
+            sessions += session
+            requester ! Right(session)
+          }
       }
     case LogoutRequest(sessionID) =>
       sessions.find(_.id == sessionID).map(sessions -= _)
@@ -109,36 +111,63 @@ class SessionHandler(config: Configuration) extends Actor {
       }
   }
 
-  private def createSessionID(user: String): Session = {
-    val sessionID = DigestUtils.sha1Hex(s"$user::${System.nanoTime()}")
-    val lifetime = config.getInt("lwm.sessions.lifetime", 8)
-    val expirationDate = DateTime.now().plusHours(lifetime)
+  private def getRoles(user: String, group: List[String]): Role = {
+    // TODO Get additional role information from user details
+    if (group.contains("labor")) Permissions.AdminRole else Permissions.DefaultRole
+  }
 
-    Session(sessionID, expirationDate, user)
+  private def createSessionID(user: String): Future[Session] = {
+    val sessionID = DigestUtils.sha1Hex(s"$user::${System.nanoTime()}")
+    val lifetime = config.getInt("lwm.sessions.lifetime").getOrElse(8)
+    val expirationDate = DateTime.now().plusHours(lifetime)
+    val groups = groupMembership(user, bindHost, bindPort, GDN)
+
+    groups map {
+      case Left(error) =>
+        val role = getRoles(user, Nil)
+        Session(sessionID, expirationDate, user, Nil, role)
+      case Right(gs) =>
+        val role = getRoles(user, gs.toList)
+        Session(sessionID, expirationDate, user, gs.toList, role)
+    }
   }
 }
 
 object Permissions {
 
-
   sealed trait Permission
 
-  trait UserCreation extends Permission
+  object UserCreation extends Permission
 
-  trait ScheduleRead extends Permission
+  object UserDeletion extends Permission
 
-  trait ScheduleCreation extends Permission
+  object UserModification extends Permission
 
-  trait ScheduleModification extends Permission
 
-  trait PermissionModification extends Permission
+  object UserInfoRead extends Permission
 
-  class DefaultPermissions extends Permission with ScheduleRead
+  object ScheduleRead extends Permission
 
-  class AdminPermissions extends DefaultPermissions
-  with UserCreation
-  with ScheduleCreation
-  with PermissionModification
-  with ScheduleModification
+  object ScheduleCreation extends Permission
+
+  object ScheduleModification extends Permission
+
+  object RoleModification extends Permission
+
+  case class Role(permissions: Set[Permission]) {
+    def +=(permission: Permission) = if (permissions.contains(Permissions.RoleModification)) Role(permissions + permission) else this
+
+    def -=(permission: Permission) = if (permissions.contains(Permissions.RoleModification)) Role(permissions - permission) else this
+
+    def contains(permission: Permission) = permissions.contains(permission)
+  }
+
+  val DefaultRole = Role(Set(ScheduleRead, UserInfoRead))
+
+  val AdminRole = Role(Set(
+    UserCreation, UserDeletion, UserModification,
+    UserInfoRead,
+    ScheduleRead, ScheduleCreation, ScheduleModification,
+    RoleModification))
 
 }
