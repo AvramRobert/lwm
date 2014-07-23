@@ -1,16 +1,19 @@
-/*require.config({
+require.config({
     paths: {
-        'jquery': 'http://code.jquery.com/jquery-2.1.0.min.js'
+        'knockout': 'http://knockoutjs.com/downloads/knockout-3.1.0',
+        'jquery': 'http://code.jquery.com/jquery-2.1.0.min',
+        'login': 'templates/login.scala.html'
     }
-});*/
+});
 
 
-require(["viewController"], function(v) {
-       function loadPage(page)
-        {
+require(["viewController", "bindings", "text!login"], function(vc,b,login) {
+    loadPage("LOGIN");
+
+       function loadPage(page) {
         switch (page) {
             case "LOGIN":
-                v.applyView(page);
+                vc.applyView(login);
                 break;
             case "REGISTRATION":
                 break;
@@ -18,16 +21,3 @@ require(["viewController"], function(v) {
     }
 });
 
-/*
-    function loadPage(page) {
-
-        switch (page) {
-            case 'LOGIN':
-                applyView(loginForm);
-                break;
-            case 'REGISTRATION':
-
-                break;
-        }
-    }
-*/

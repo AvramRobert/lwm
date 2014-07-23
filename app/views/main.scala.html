@@ -8,6 +8,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         <script src="@routes.Assets.at("javascripts/hello.js")" type="text/javascript"></script>
+        @helper.requireJs(core = "http://requirejs.org/docs/release/2.1.14/minified/require.js", module = routes.Assets.at("javascripts/main").url)
     </head>
     <body>
         @content
