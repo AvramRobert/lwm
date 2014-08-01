@@ -1,4 +1,4 @@
-package util
+package utils
 
 import com.typesafe.config.ConfigFactory
 import com.unboundid.ldap.sdk._
@@ -68,6 +68,8 @@ object LDAPAuthentication {
         }
     }
   }
+
+  def nameInfo(user: String, bindHost: String, bindPort: Int, dn: String): Future[Either[String, String]] = ???
 
   /**
    * Establishes a connection with the LDAP Server and runs an arbitrary function.
