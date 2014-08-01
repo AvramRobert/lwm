@@ -1,0 +1,67 @@
+@(title: String)(lables: List[String])(degrees: List[String])
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <script src="@routes.Assets.at("javascripts/hello.js")" type="text/javascript"></script>
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+        @helper.requireJs(core = "http://requirejs.org/docs/release/2.1.14/minified/require.js", module = routes.Assets.at("javascripts/main").url)
+    </head>
+    <body>
+
+        @for(t <- lables) {
+            <div id="" class="">
+                <div id="" class="">
+                    <lable class="">@t</lable>
+                    @t match {
+                        case "E-mail" => {
+                            <input type="email" id="@t.toLowerCase" placeholder="@t"/>
+                        }
+                        case "Studiengang" => {
+                            <select id="degree">
+
+                            @for(d <- degrees) {
+                                <option id="@d.toLowerCase">@d</option>
+                            }
+                            </select>
+                        }
+                        case _ => {
+                            <input type="text" id="@t.toLowerCase" placeholder="@t"/>
+                        }
+                    }
+                </div>
+            </div>
+        }
+        <form id="registerForm" role="" class="">
+            <div id="submit" class="">
+                <div class="">
+                    <input type="button" id="register" value="Registrieren">
+                </div>
+            </div>
+        </form>
+        <script type="text/javascript">
+        $ ( document ).ready ( function ( ) {
+        $ ( '#register' ).click ( function ( event ) {
+        event.preventDefault ;
+        require ([ 'inputHandler' , 'messages', 'ajax'], function ( i, m, a ) {
+        var matnr = $ ( '#matrikelnummer' ).val ( ) ;
+        var phone = $ ( '#telefon' ).val ( ) ;
+        var address = $ ( '#anschrift' ).val ( ) ;
+        var city = $ ( '#ort' ).val ( ) ;
+        var plz = $ ( '#plz' ).val ( ) ;
+        var mail = $ ( '#email' ).val ( ) ;
+        var degree = $ ( '#degree' ).val ( ) ;
+        var payload = { matrikelnummer : matnr, telefon : phone, anschrift : address, ort : city, plz : plz, email : mail, degree : degree } ;
+        if ( i.checkInput ( payload ) ) {
+            a.ajaxRequest("/api/register", "POST", "application/json", payload, m.setDashboard);
+        }
+        } ) ;
+        } ) ;
+        } ) ;
+        </script>
+    </body>
+</html>

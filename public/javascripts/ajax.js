@@ -7,8 +7,10 @@ define(['jquery'], function ($) {
                 type: type,
                 contentType: contentType + '; charset=UTF-8',
                 data: JSON.stringify(data),
-                success: function (message) {
-                    funct(message);
+                success: function (message, textStatus, request) {
+                    if(funct != null) {
+                        funct(request.getResponseHeader("access"),textStatus, message);
+                    }
                 },
                 error: function (error) {
                     funct(error);

@@ -1,7 +1,7 @@
 define(['knockout', 'modelView'], function(k, mv){
     var viewModel = {body: k.observable(), contents: k.observable()};
     return {
-        applyView: function (view) {
+        applyViewValues: function (view) {
             viewModel.body(view);
             mv.updateView('body', view);
             k.applyBindings(viewModel);

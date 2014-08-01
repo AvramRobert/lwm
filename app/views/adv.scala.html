@@ -1,0 +1,42 @@
+@(title: String)(navigation: List[String])(content: List[String])(pane: List[String])
+
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <script src="@routes.Assets.at("javascripts/hello.js")" type="text/javascript"></script>
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+        @helper.requireJs(core = "http://requirejs.org/docs/release/2.1.14/minified/require.js", module = routes.Assets.at("javascripts/main").url)
+    </head>
+    <body>
+        <header id="" class="">
+            <div id="searchBar" class=""><div class=""> <input type="text" id="searchInput"> <input type="submit" value="?"/>
+            </div>
+            </div>
+        </header>
+
+        <nav id="navigation" class="">
+            <!-- INJECT LIST -->
+        </nav>
+        <div id="contentContainer" class="">
+            <div id="contentArea">
+                <!-- INJECT LIST -->
+            </div>
+            <div id="filterBar" class="">
+                <div class="">
+                    <input type="text" id="filterInput" placeholder="Filter">
+                </div>
+            </div>
+        </div>
+        <div id="contentPane">
+            <!-- INJECT INFORMATION -->
+        </div>
+    </body>
+</html>
+<script type="text/javascript">
+    //ADD SCRIPT
+</script>
