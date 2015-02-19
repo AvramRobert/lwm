@@ -237,7 +237,6 @@ function superUserUpdate(hash, url) {
     ajaxHO("/superuser", "POST", "application/json", obj, reload);
 }
 
-
 function getPossibleAlternateDates(student, labwork, group, groupId, orderId, hash) {
     var json = {group: group, gId: groupId, oId: orderId};
     $("#newSchedule"+hash).html("<option value='none'>Wird geladen.. </option>");

@@ -1,5 +1,7 @@
 package utils
 
+import java.net.{ URLEncoder, URLDecoder }
+
 import com.hp.hpl.jena.query.QueryExecutionFactory
 import com.hp.hpl.jena.rdf.model.RDFNode
 import com.hp.hpl.jena.update.{ UpdateFactory, UpdateExecutionFactory }
@@ -11,6 +13,11 @@ case class UpdateHost(host: String)
 case class QuerySolution(data: Map[String, RDFNode])
 
 object Implicits {
+
+  implicit def iURLManipulator(s: String) = new {
+    def encodeString: String = URLEncoder.encode(s, "UTF-8")
+    def decodeString: String = URLDecoder.decode(s, "UTF-8")
+  }
 
   implicit class StringWithSelectExecution(string: String) {
 

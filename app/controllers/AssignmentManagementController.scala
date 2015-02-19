@@ -260,7 +260,7 @@ object AssignmentManagementController extends Controller with Authentication {
           val description = p.markdownToHtml(i.props.getOrElse(lwm.hasDescription, List(StringLiteral(""))).head.value)
           val label = i.props.getOrElse(rdfs.label, List(StringLiteral(""))).head.value
           val topics = i.props.getOrElse(lwm.hasTopic, List(StringLiteral(""))).head.value
-          Future(Ok(views.html.assignment_export(label, Html.apply(description), Html.apply(text), Html.apply(hints), Html.apply(goals), topics))).recover {
+          Future(Ok(views.html.assignment_export(label, Html(description), Html(text), Html(hints), Html(goals), topics))).recover {
             case NonFatal(e) ⇒
               InternalServerError(s"Oops. There seems to be a problem ($e) with the server. We are working on it!")
           }

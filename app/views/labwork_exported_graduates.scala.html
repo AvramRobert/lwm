@@ -1,20 +1,39 @@
 @(labwork: Resource)(implicit requestHeader: RequestHeader)
+@import org.joda.time.LocalDate
 @import utils.semantic.Resource
 
-
 <!DOCTYPE html>
-<html>
-    @head("Praktikum Absolventen")
-    <body>
-        <div class="container" id="everything">
-            <section>
-                <table class="table table-bordered">
-                    <tr> <th>Nachname</th> <th>Vorname</th> <th>Matrikelnummer</th> <th>ADV-Kennung</th></tr>
-                    <tbody>
+    <html class="custom-print">
+        @head("Praktikum Absolventen")
+        <body>
+            <div class="container" id="everything">
+                <section>
+                    <div class="page-header">
+                        <div class="row">
+                            <h5> <div class="col-md-6 pull-left"><label>Studiengang: </label>@helpers.labworks.labworkDegree(labwork)</div>
+                                <div class="col-md-6 pull-right"><label>Fach: </label>@helpers.labworks.labworkCourse(labwork)</div>
+                            </h5>
+                        </div>
+                        <div class="row">
+                            <h5>
+                                <div class="col-md-6 pull-left">
+                                    <label>Dozent: </label> __________________
+                                </div>
+                            </h5>
+                        </div>
+                        <div class="row">
+                            <h5>
+                                <div class="col-md-6 pull-left"><label>Datum: </label> @{
+                                    LocalDate.now().toString("dd-MM-yyyy")
+                                }</div>
+                                <div class="col-md-6 pull-right"><label>Unterschrift: </label> ________________</div>
+                            </h5>
+                        </div>
+                    </div>
+                </section>
+                <section>
                     @helpers.labworks.labworkGraduateTable(labwork)
-                    </tbody>
-                </table>
-            </section>
-        </div>
-    </body>
-</html>
+                </section>
+            </div>
+        </body>
+    </html>

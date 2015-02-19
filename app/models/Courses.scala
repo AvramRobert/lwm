@@ -1,5 +1,7 @@
 package models
 
+import java.net.URLEncoder
+
 import play.api.data.Form
 import play.api.data.Forms._
 import utils.{ QueryHost, UpdateHost }
@@ -16,9 +18,8 @@ case class CourseFormModel(name: String, id: String, degree: String)
 object Courses extends CheckedDelete {
 
   import scala.concurrent.ExecutionContext.Implicits.global
-
   def create(course: Course)(implicit updateHost: UpdateHost): Future[Resource] = {
-    val resource = Resource(s"${utils.Global.lwmNamespace}courses/${course.id}")
+    val resource = Resource(s"${utils.Global.lwmNamespace}courses/${course.id}/${course.degree.hashCode}")
 
     val p = Promise[Resource]()
 

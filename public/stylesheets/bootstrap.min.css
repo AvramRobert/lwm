@@ -198,11 +198,12 @@ td, th {
 }
 
 @media print {
+
     * {
         text-shadow: none !important;
         color: #000 !important;
         background: transparent !important;
-        box-shadow: none !important
+        box-shadow: none !important;
     }
 
     a, a:visited {
@@ -280,6 +281,11 @@ td, th {
     .no-print, .no-print *
     {
         display: none !important;
+    }
+
+    .custom-print {
+        margin-top: 3mm;
+        margin-left: 9mm;
     }
 }
 
