@@ -15,9 +15,9 @@ class CourseSpec extends SemanticFeatureSpec {
   val course2 = Course("test_name2", "test_id_2", Resource("http://test_degree.com"))
   val course3 = Course("test_name3", "test_id_3", Resource("http://test_degree.com"))
 
-  val expectedResource1 = Resource("http://lwm.gm.fh-koeln.de/courses/test_id_1")
-  val expectedResource2 = Resource("http://lwm.gm.fh-koeln.de/courses/test_id_2")
-  val expectedResource3 = Resource("http://lwm.gm.fh-koeln.de/courses/test_id_3")
+  val expectedResource1 = Resource(s"http://lwm.gm.fh-koeln.de/courses/test_id_1/${course1.degree.hashCode()}")
+  val expectedResource2 = Resource(s"http://lwm.gm.fh-koeln.de/courses/test_id_2/${course2.degree.hashCode()}")
+  val expectedResource3 = Resource(s"http://lwm.gm.fh-koeln.de/courses/test_id_3/${course3.degree.hashCode()}")
 
   "courses" should {
     "return the number of courses" in {
@@ -54,7 +54,7 @@ class CourseSpec extends SemanticFeatureSpec {
     }
 
     "delete an existing course" in {
-      val futureResource = Courses.delete(course1.id)
+      val futureResource = Courses.delete(s"${course1.id}/${course1.degree.hashCode()}")
 
       whenReady(futureResource) { deleted ⇒
         deleted should be(expectedResource1)
