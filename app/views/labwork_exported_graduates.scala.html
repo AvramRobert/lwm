@@ -7,33 +7,7 @@
         @head("Praktikum Absolventen")
         <body>
             <div class="container" id="everything">
-                <section>
-                    <div class="page-header">
-                        <div class="row">
-                            <h5> <div class="col-md-6 pull-left"><label>Studiengang: </label>@helpers.labworks.labworkDegree(labwork)</div>
-                                <div class="col-md-6 pull-right"><label>Fach: </label>@helpers.labworks.labworkCourse(labwork)</div>
-                            </h5>
-                        </div>
-                        <div class="row">
-                            <h5>
-                                <div class="col-md-6 pull-left">
-                                    <label>Dozent: </label> __________________
-                                </div>
-                            </h5>
-                        </div>
-                        <div class="row">
-                            <h5>
-                                <div class="col-md-6 pull-left"><label>Datum: </label> @{
-                                    LocalDate.now().toString("dd-MM-yyyy")
-                                }</div>
-                                <div class="col-md-6 pull-right"><label>Unterschrift: </label> ________________</div>
-                            </h5>
-                        </div>
-                    </div>
-                </section>
-                <section>
                     @helpers.labworks.labworkGraduateTable(labwork)
-                </section>
             </div>
         </body>
     </html>

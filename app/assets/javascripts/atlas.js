@@ -21,6 +21,12 @@ function toggleHiddenStatus(labworkUri, studentUri, studentHash){
     } );
 }
 
+
+function injectProfessorName() {
+    var name = $('#profName').val();
+    $('#profSection' ).html(name);
+}
+
 function logOut() {
     ajaxHO("/api/sessions", "DELETE", null, null, redirect);
 }

@@ -78,3 +78,10 @@ libraryDependencies += "org.seleniumhq.selenium" % "selenium-remote-driver" % "2
 libraryDependencies += "org.seleniumhq.selenium" % "selenium-firefox-driver" % "2.44.0" % "test" withSources() withJavadoc()
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test" withSources() withJavadoc()
+
+libraryDependencies += "org.openrdf.sesame" % "sesame-runtime" % "2.7.13" withSources() withJavadoc()
+
+libraryDependencies += "commons-logging" % "commons-logging" % "1.1.1"
+
+libraryDependencies += "org.slf4j" % "slf4j-log4j12" % "1.7.10"
+

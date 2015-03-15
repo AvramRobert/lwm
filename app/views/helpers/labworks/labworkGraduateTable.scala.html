@@ -1,31 +1,54 @@
 @(labwork: Resource)
-@import org.joda.time.LocalDate
-@import java.net.URLDecoder
-@import utils.semantic.Resource
-@import utils.Global._
-@import utils.semantic.Vocabulary
-@import com.hp.hpl.jena.query.QueryExecutionFactory
+    @import org.joda.time.LocalDate
+    @import java.net.URLDecoder
+    @import utils.semantic.Resource
+    @import utils.Global._
+    @import utils.semantic.Vocabulary
+    @import com.hp.hpl.jena.query.QueryExecutionFactory
 
-@{
+    @{
+        val degree = helpers.labworks.labworkDegree(labwork)
+        val course = helpers.labworks.labworkCourse(labwork)
+        val date = LocalDate.now().toString("dd-MM-yyyy")
 
-    val tableize = (grouped: Iterator[Vector[String]]) => {
-        grouped.map(v => v.+:(
-            """
-              |
-              |<section class='pagebreak'>
-              |<table class='table table-bordered'>
-              |<tbody>
-              |<tr> <th>Nr.</th> <th>Nachname</th> <th>Vorname</th> <th>Mat.-Nr.</th> <th>ADV-Kennung</th> <th> Datum </th> <th>A / N</th></tr>
-            """.stripMargin).:+(
-            """
-               |</tbody>
-               |</table>
-               |</section>
-             """.stripMargin))
-    }
+        val tableize = (grouped: Iterator[Vector[String]]) => {
+            grouped.map(v => v.+:(
+                s"""
+                |<section class='pagebreak'>
+                |<div class="page-header">
+                |        <div class="row">
+                |            <h5> <div class="col-md-6 pull-left"><label>Studiengang: </label>$degree</div>
+                |                <div class="col-md-6 pull-right"><label>Fach: </label>$course</div>
+                |            </h5>
+                |        </div>
+                |        <div class="row">
+                |            <h5>
+                |                <div class="col-md-6 pull-left">
+                |                    <label>Dozent: </label>
+                |                    <span id="profSection">_________________</span>
+                |                </div>
+                |            </h5>
+                |        </div>
+                |        <div class="row">
+                |            <h5>
+                |                <div class="col-md-6 pull-left"><label>Datum: </label>$date</div>
+                |                <div class="col-md-6 pull-right"><label>Unterschrift: </label> ________________</div>
+                |            </h5>
+                |        </div>
+                |    </div>
+                |<table class='table table-bordered'>
+                |<tbody>
+                |<tr> <th>Nr.</th> <th>Nachname</th> <th>Vorname</th> <th>Mat.-Nr.</th> <th>ADV-Kennung</th> <th> Datum </th> <th>A / N</th></tr>
+                """.stripMargin).:+(
+                """
+                   |</tbody>
+                   |</table>
+                   |</section>
+                 """.stripMargin))
+        }
 
-    val query =
-        s"""
+        val query =
+            s"""
        |${Vocabulary.defaultPrefixes}
        |
        | Select ?lastname ?firstname ?regId ?gmId ?approval {
@@ -44,18 +67,18 @@
        | } order by asc(?lastname)
            """.stripMargin
 
-    val result = QueryExecutionFactory.sparqlService(queryHost, query).execSelect()
-    var vector = Vector[String]()
-    while(result.hasNext) {
-        val solution = result.next()
-        val lastname = URLDecoder.decode(solution.getLiteral("lastname").getString, "UTF-8")
-        val firstname = URLDecoder.decode(solution.getLiteral("firstname").getString, "UTF-8")
-        val regId = solution.getLiteral("regId").getString
-        val gmId = solution.getLiteral("gmId").getString
-        val approval = if(solution.contains("approval")) "<b class='text-info'>A</b>" else "<b class='text-danger'>N</b>"
+        val result = QueryExecutionFactory.sparqlService(queryHost, query).execSelect()
+        var vector = Vector[String]()
+        while (result.hasNext) {
+            val solution = result.next()
+            val lastname = URLDecoder.decode(solution.getLiteral("lastname").getString, "UTF-8")
+            val firstname = URLDecoder.decode(solution.getLiteral("firstname").getString, "UTF-8")
+            val regId = solution.getLiteral("regId").getString
+            val gmId = solution.getLiteral("gmId").getString
+            val approval = if(solution.contains("approval")) "<b class='text-info'>A</b>" else "<b class='text-danger'>N</b>"
 
-        vector = vector :+
-          s"""
+            vector = vector :+
+                    s"""
              |  <td>$lastname</td>
              |  <td>$firstname</td>
              |  <td>$regId</td>
@@ -63,13 +86,11 @@
              |  <td>${LocalDate.now().toString("dd-MM-yyyy")}</td>
              |  <td>$approval</td>
            """.stripMargin
-    }
-    vector = Array.tabulate(vector.length) { i => s"<tr><td>$i</td> ${vector(i)}</tr>"}.toVector
-    val table1 = tableize(vector.take(18).grouped(18))
-    val table2 = tableize(vector.drop(18).grouped(22))
-    val grouped = table1 ++ table2
-    vector = Vector.empty[String]
-    grouped.foreach(v => vector = vector :+ v.mkString(""))
+        }
+        vector = Array.tabulate(vector.length) { i => s"<tr><td>$i</td> ${vector(i)}</tr>"}.toVector
+        val table = tableize(vector.grouped(15))
+        vector = Vector.empty[String]
+        table.foreach(v => vector = vector :+ v.mkString(""))
 
-    Html(vector.mkString(""))
-}
+        Html(vector.mkString(""))
+    }
